@@ -1,11 +1,15 @@
 import React from "react";
 import { View, Text, Dimensions } from "react-native";
 import { LineChart as LineChartKit } from "react-native-chart-kit";
+import { Color } from "../util/Colors";
 
 interface Props {
   data: any[];
   labels: string[];
-  name: string;
+  name?: string;
+  yAxisLabel?: string;
+  yAxisSuffex?: string;
+  backgroundColor?: Color;
 }
 
 export default function LineChart(props: Props) {
@@ -21,15 +25,19 @@ export default function LineChart(props: Props) {
             },
           ],
         }}
-        width={Dimensions.get("window").width} // from react-native
+        width={Dimensions.get("window").width - 30} // from react-native
         height={220}
-        yAxisLabel=""
-        yAxisSuffix="°C"
+        yAxisLabel={props.yAxisLabel}
+        yAxisSuffix={props.yAxisSuffex}
         yAxisInterval={1} // optional, defaults to 1
         chartConfig={{
           backgroundColor: "#e26a00",
-          backgroundGradientFrom: "#fb8c00",
-          backgroundGradientTo: "#ffa726",
+          backgroundGradientFrom: props.backgroundColor
+            ? props.backgroundColor
+            : "#fb8c00",
+          backgroundGradientTo: props.backgroundColor
+            ? props.backgroundColor
+            : "#ffa726",
           decimalPlaces: 2, // optional, defaults to 2dp
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,

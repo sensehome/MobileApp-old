@@ -1,17 +1,16 @@
-import { HubConnectionState } from "@microsoft/signalr";
 import React from "react";
-import { View, Text, StyleSheet, StatusBar } from "react-native";
-import LineChart from "../../components/LineChart";
+import HomeActivityView from "./HomeActivityView";
+import { HubConnectionState } from "@microsoft/signalr";
 import { TemperatureHumidityDto } from "../../models/TemperatureHumidityDto";
 import { AgentService } from "../../services/agent.service";
 
 export default class HomeActivity extends React.Component {
   state = {
     temperature: 0.0,
-    humdity: 0.0,
+    humidity: 0.0,
 
-    temperaureList: [0],
-    humidityList: [],
+    temperatureList: [0],
+    humidityList: [0],
     timeSeries: [new Date().toLocaleTimeString().substr(0, 5)],
   };
 
@@ -72,22 +71,30 @@ export default class HomeActivity extends React.Component {
 
     this.setState({
       temperature: temp,
-      humdity: temperatureHumidity.humidity,
+      humidity: temperatureHumidity.humidity,
     });
-    if (this.state.temperaureList.length < this.MAX_X) {
+    if (this.state.temperatureList.length < this.MAX_X) {
       this.setState({
-        temperaureList: [...this.state.temperaureList, temp],
+        temperatureList: [...this.state.temperatureList, temp],
+        humidityList: [
+          ...this.state.humidityList,
+          temperatureHumidity.humidity,
+        ],
         timeSeries: [
           ...this.state.timeSeries,
           new Date().toLocaleTimeString().substr(0, 5),
         ],
       });
     } else {
-      let len = this.state.temperaureList.length;
+      let len = this.state.temperatureList.length;
       this.setState({
-        temperaureList: [
-          ...this.state.temperaureList.slice(len - this.MAX_X, len),
+        temperatureList: [
+          ...this.state.temperatureList.slice(len - this.MAX_X, len),
           temp,
+        ],
+        humidityList: [
+          ...this.state.humidityList.slice(len - this.MAX_X, len),
+          temperatureHumidity.humidity,
         ],
         timeSeries: [
           ...this.state.timeSeries.slice(len - this.MAX_X, len),
@@ -98,26 +105,6 @@ export default class HomeActivity extends React.Component {
   };
 
   render() {
-    return (
-      <View style={styles.container}>
-        <StatusBar />
-        <Text>Temperaure : {this.state.temperature} °C</Text>
-        <Text>Humidity : {this.state.humdity} %</Text>
-        <LineChart
-          name="Realtime Temperature"
-          data={this.state.temperaureList}
-          labels={this.state.timeSeries}
-        />
-      </View>
-    );
+    return <HomeActivityView {...this.state} />;
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
