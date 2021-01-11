@@ -4,7 +4,8 @@ import { HubConnectionState } from "@microsoft/signalr";
 import { TemperatureHumidityDto } from "../../models/TemperatureHumidityDto";
 import { AgentService } from "../../services/agent.service";
 import StoreService from "../../services/store.service";
-import { LoginDto } from "../../models/LoginDto";
+import { LoginDto, TokenDto } from "../../models/LoginDto";
+import APIService from "../../services/api.service";
 
 export default class HomeActivity extends React.Component {
   state = {
@@ -12,6 +13,7 @@ export default class HomeActivity extends React.Component {
     humidity: 0.0,
     shouldRender: false,
     shouldLogin: false,
+    isLogging: false,
     temperatureList: [0],
     humidityList: [0],
     timeSeries: [new Date().toLocaleTimeString().substr(0, 5)],
@@ -118,7 +120,32 @@ export default class HomeActivity extends React.Component {
     }
   };
 
-  onLogin = (data: LoginDto) => {};
+  onLogin = (data: LoginDto) => {
+    this.setState({ isLogging: true });
+    APIService.login(data)
+      .then((res) => {
+        let token = res.data as TokenDto;
+        StoreService.setBearerToken(token.bearer)
+          .then((res) => {
+            this.initializeAgentHubConnection();
+          })
+          .catch((err) => {
+            alert("Something went wrong");
+          })
+          .finally(() => {
+            this.setState({
+              shouldLogin: false,
+              isLogging: false,
+            });
+          });
+      })
+      .catch((err) => {
+        alert("Invalid credential");
+        this.setState({
+          isLogging: false,
+        });
+      });
+  };
 
   render() {
     if (this.state.shouldRender) {

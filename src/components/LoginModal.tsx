@@ -5,6 +5,7 @@ import { LoginDto } from "../models/LoginDto";
 interface LoginModalProps {
   onLogin: (data: LoginDto) => void;
   show?: boolean;
+  isLogging?: boolean;
 }
 
 const LoginModal = (props: LoginModalProps) => {
@@ -50,7 +51,8 @@ const LoginModal = (props: LoginModalProps) => {
                 login.password = password;
                 props.onLogin(login);
               }}
-              title="Login"
+              disabled={props.isLogging}
+              title={props.isLogging ? "Logging" : "Login"}
               accessibilityLabel="Login button"
             />
           </View>

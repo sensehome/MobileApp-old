@@ -27,6 +27,7 @@ interface Props {
   timeSeries: string[];
   onLogin: (data: LoginDto) => void;
   shouldLogin?: boolean;
+  isLogging?: boolean;
 }
 
 export default function HomeActivityView(props: Props) {
@@ -37,7 +38,11 @@ export default function HomeActivityView(props: Props) {
       <ScrollView>
         <View style={styles.container}>
           <StatusBar />
-          <LoginModal show={props.shouldLogin} onLogin={props.onLogin} />
+          <LoginModal
+            show={props.shouldLogin}
+            onLogin={props.onLogin}
+            isLogging={props.isLogging}
+          />
           {props.shouldLogin ? (
             <></>
           ) : (
