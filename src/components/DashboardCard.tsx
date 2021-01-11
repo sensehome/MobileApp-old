@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { View, Text } from "react-native";
+import { View, Text, Switch } from "react-native";
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Card } from "react-native-elements";
 import { Color } from "../util/Colors";
@@ -11,6 +11,7 @@ interface Props {
   icon: IconDefinition;
   backgroundColor?: Color;
   textColor?: Color;
+  children?: React.ReactNode;
 }
 
 export default function DashboardCard(props: Props) {
@@ -52,6 +53,7 @@ export default function DashboardCard(props: Props) {
         >
           {props.content}
         </Text>
+        {props.children ? <View>{props.children}</View> : <></>}
       </View>
     </Card>
   );

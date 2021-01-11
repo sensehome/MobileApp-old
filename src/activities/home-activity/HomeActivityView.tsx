@@ -7,6 +7,7 @@ import {
   StatusBar,
   SafeAreaView,
   ScrollView,
+  Switch,
 } from "react-native";
 import {
   faFan,
@@ -15,6 +16,8 @@ import {
   faTint,
 } from "@fortawesome/free-solid-svg-icons";
 import { Color } from "../../util/Colors";
+import LoginModal from "../../components/LoginModal";
+import { LoginDto } from "../../models/LoginDto";
 
 interface Props {
   temperature: number;
@@ -22,84 +25,111 @@ interface Props {
   temperatureList: number[];
   humidityList: number[];
   timeSeries: string[];
+  onLogin: (data: LoginDto) => void;
+  shouldLogin?: boolean;
 }
 
 export default function HomeActivityView(props: Props) {
+  const [isEnabled, setIsEnabled] = React.useState(false);
+  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
   return (
     <SafeAreaView>
       <ScrollView>
         <View style={styles.container}>
           <StatusBar />
-          <View>
-            <View
-              style={{
-                display: "flex",
-                justifyContent: "flex-start",
-                flexDirection: "row",
-              }}
-            >
-              <DashboardCard
-                backgroundColor={Color.Danger}
-                textColor={Color.White}
-                title="Home Light"
-                content={`OFF`}
-                icon={faLightbulb}
-              />
-              <DashboardCard
-                backgroundColor={Color.Danger}
-                title="Home Fan"
-                textColor={Color.White}
-                content={`OFF`}
-                icon={faFan}
-              />
+          <LoginModal show={props.shouldLogin} onLogin={props.onLogin} />
+          {props.shouldLogin ? (
+            <></>
+          ) : (
+            <View>
+              <View>
+                <View
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    flexDirection: "row",
+                  }}
+                >
+                  <DashboardCard
+                    backgroundColor={Color.Danger}
+                    textColor={Color.White}
+                    title="Home Light"
+                    content={`OFF`}
+                    icon={faLightbulb}
+                  >
+                    <Switch
+                      trackColor={{ false: "#767577", true: "#81b0ff" }}
+                      thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+                      ios_backgroundColor="#3e3e3e"
+                      onValueChange={toggleSwitch}
+                      value={isEnabled}
+                    />
+                  </DashboardCard>
+                  <DashboardCard
+                    backgroundColor={Color.Danger}
+                    title="Home Fan"
+                    textColor={Color.White}
+                    content={`OFF`}
+                    icon={faFan}
+                  >
+                    <Switch
+                      trackColor={{ false: "#767577", true: "#81b0ff" }}
+                      thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+                      ios_backgroundColor="#3e3e3e"
+                      onValueChange={toggleSwitch}
+                      value={isEnabled}
+                    />
+                  </DashboardCard>
+                </View>
+                <View
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    flexDirection: "row",
+                  }}
+                >
+                  <DashboardCard
+                    backgroundColor={Color.Warning}
+                    textColor={Color.White}
+                    title="Temperature"
+                    content={`${props.temperature}°C`}
+                    icon={faThermometerHalf}
+                  />
+                  <DashboardCard
+                    backgroundColor={Color.Primary}
+                    title="Humidity"
+                    textColor={Color.White}
+                    content={`${props.humidity}%`}
+                    icon={faTint}
+                  />
+                </View>
+              </View>
+              <View
+                style={{
+                  margin: 5,
+                }}
+              >
+                <LineChart
+                  name="Realtime Temperature"
+                  yAxisSuffex="°C"
+                  data={props.temperatureList}
+                  labels={props.timeSeries}
+                />
+              </View>
+              <View
+                style={{
+                  margin: 5,
+                }}
+              >
+                <LineChart
+                  name="Realtime Humidity"
+                  backgroundColor={Color.Primary}
+                  data={props.humidityList}
+                  labels={props.timeSeries}
+                />
+              </View>
             </View>
-            <View
-              style={{
-                display: "flex",
-                justifyContent: "flex-start",
-                flexDirection: "row",
-              }}
-            >
-              <DashboardCard
-                backgroundColor={Color.Warning}
-                textColor={Color.White}
-                title="Temperature"
-                content={`${props.temperature}°C`}
-                icon={faThermometerHalf}
-              />
-              <DashboardCard
-                backgroundColor={Color.Primary}
-                title="Humidity"
-                textColor={Color.White}
-                content={`${props.humidity}%`}
-                icon={faTint}
-              />
-            </View>
-          </View>
-          <View
-            style={{
-              margin: 5,
-            }}
-          >
-            <LineChart
-              name="Realtime Temperature"
-              yAxisSuffex="°C"
-              data={props.temperatureList}
-              labels={props.timeSeries}
-            />
-          </View>
-          <View
-            style={{
-              margin: 5,
-            }}
-          >
-            <LineChart
-              name="Realtime Humidity"
-              backgroundColor={Color.Primary}
-              data={props.humidityList}
-              labels={props.timeSeries}
-            />
-          </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

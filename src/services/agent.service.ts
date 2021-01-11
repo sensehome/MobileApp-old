@@ -14,8 +14,9 @@ export class AgentService {
   }
 
   public static getInstance() : AgentService {
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjVmZjBhOWQ1ZWMyNjIyNjViOTM2ZmFlZiIsInJvbGUiOiIxIiwibmJmIjoxNjEwMTI5Nzc0LCJleHAiOjE2MTA3MzQ1NzQsImlhdCI6MTYxMDEyOTc3NH0.JlAaprvMDvNhTMVK2CDYhixgOX7knupTDA2n-1CWvMg"
     if(!AgentService.instance){
-      AgentService.instance = new AgentService('http://192.168.0.100:4000/agenthub')
+      AgentService.instance = new AgentService(`http://agent.sensehome.online/agenthub?access_token=${token}`)
     }
     return AgentService.instance
   }

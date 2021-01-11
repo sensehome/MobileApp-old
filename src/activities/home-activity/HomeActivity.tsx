@@ -3,12 +3,15 @@ import HomeActivityView from "./HomeActivityView";
 import { HubConnectionState } from "@microsoft/signalr";
 import { TemperatureHumidityDto } from "../../models/TemperatureHumidityDto";
 import { AgentService } from "../../services/agent.service";
+import StoreService from "../../services/store.service";
+import { LoginDto } from "../../models/LoginDto";
 
 export default class HomeActivity extends React.Component {
   state = {
     temperature: 0.0,
     humidity: 0.0,
-
+    shouldRender: false,
+    shouldLogin: false,
     temperatureList: [0],
     humidityList: [0],
     timeSeries: [new Date().toLocaleTimeString().substr(0, 5)],
@@ -17,7 +20,21 @@ export default class HomeActivity extends React.Component {
   MAX_X = 7;
 
   componentDidMount() {
-    this.initializeAgentHubConnection();
+    StoreService.getBearerToken()
+      .then((res) => {
+        this.initializeAgentHubConnection();
+        console.log(res);
+      })
+      .catch((err) => {
+        this.setState({
+          shouldLogin: true,
+        });
+      })
+      .finally(() => {
+        this.setState({
+          shouldRender: true,
+        });
+      });
   }
 
   initializeAgentHubConnection = () => {
@@ -57,17 +74,14 @@ export default class HomeActivity extends React.Component {
         }
       });
     } else {
-      alert("Agent is not connected with briker");
     }
   };
 
-  onAgentMqttConnectionCallback = (isConnected: boolean) => {
-    alert(`Agent is Connected : ${isConnected}`);
-  };
+  onAgentMqttConnectionCallback = (isConnected: boolean) => {};
 
   onTemperatureHumidityReadingCallback = (topic: string, payload: string) => {
     let temperatureHumidity = JSON.parse(payload) as TemperatureHumidityDto;
-    let temp = Number.parseFloat(temperatureHumidity.temperature.toFixed(2));
+    let temp = Number.parseFloat(temperatureHumidity.temperature.toFixed(1));
 
     this.setState({
       temperature: temp,
@@ -104,7 +118,12 @@ export default class HomeActivity extends React.Component {
     }
   };
 
+  onLogin = (data: LoginDto) => {};
+
   render() {
-    return <HomeActivityView {...this.state} />;
+    if (this.state.shouldRender) {
+      return <HomeActivityView {...this.state} onLogin={this.onLogin} />;
+    }
+    return <></>;
   }
 }
