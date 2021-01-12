@@ -38,7 +38,11 @@ export default function HomeActivityView(props: Props) {
                 </View>
               </View>
 
-              <View>
+              <View
+                style={{
+                  marginTop: 10,
+                }}
+              >
                 <TemperatureHumiditityChartView />
               </View>
 

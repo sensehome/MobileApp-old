@@ -48,12 +48,25 @@ export default function DashboardCard(props: Props) {
         <Text
           style={{
             color: props.textColor ? props.textColor : Color.Black,
-            fontSize: 25,
+            fontSize: 20,
           }}
         >
           {props.content}
         </Text>
-        {props.children ? <View>{props.children}</View> : <></>}
+        {props.children ? (
+          <View
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+            }}
+          >
+            {props.children}
+          </View>
+        ) : (
+          <></>
+        )}
       </View>
     </Card>
   );

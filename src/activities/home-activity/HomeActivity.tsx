@@ -8,6 +8,9 @@ import { TemperatureHumidityDto } from "../../models/TemperatureHumidityDto";
 import { AgentService } from "../../services/agent.service";
 import { AuthProvider } from "../../context/AuthContext";
 import { TemperatureHumidityProvider } from "../../context/TemperatureHumidityContext";
+import { LightFanActionProvider } from "../../context/LightFanActionContext";
+import { RelayComponentStatusDto } from "../../models/RelayComponentDto";
+import { Status } from "../../util/EnumTypes";
 
 export default class HomeActivity extends React.Component {
   state = {
@@ -19,6 +22,10 @@ export default class HomeActivity extends React.Component {
     temperatureList: [0],
     humidityList: [0],
     timeSeries: [new Date().toLocaleTimeString().substr(0, 5)],
+    lightStatus: "N/A",
+    fanStatus: "N/A",
+    lightSwitch: false,
+    fanSwitch: false,
   };
 
   MAX_X = 7;
@@ -47,11 +54,18 @@ export default class HomeActivity extends React.Component {
         .Hub.start()
         .then(() => {
           this.agentHubSubsriptions();
+          AgentService.getInstance().Hub.onclose((err) => {
+            this.autoReconnectAgent();
+          });
         })
         .catch((err) => {
           console.log(err);
         });
     }
+  };
+
+  autoReconnectAgent = () => {
+    setTimeout(this.initializeAgentHubConnection, 5000);
   };
 
   agentHubSubsriptions = () => {
@@ -61,6 +75,14 @@ export default class HomeActivity extends React.Component {
       {
         topic: "home/temperature-humidity",
         handler: this.onTemperatureHumidityReadingCallback,
+      },
+      {
+        topic: "home/living-room/light/status",
+        handler: this.onLivingRoomLightStatusReadingCallback,
+      },
+      {
+        topic: "home/living-room/fan/status",
+        handler: this.onLivingRoomFanStatusReadingCallback,
       },
     ];
 
@@ -120,6 +142,22 @@ export default class HomeActivity extends React.Component {
     }
   };
 
+  onLivingRoomLightStatusReadingCallback = (topic: string, payload: string) => {
+    let componentStatus = JSON.parse(payload) as RelayComponentStatusDto;
+    this.setState({
+      lightSwitch: componentStatus.status === Status.ON,
+      lightStatus: componentStatus.status,
+    });
+  };
+
+  onLivingRoomFanStatusReadingCallback = (topic: string, payload: string) => {
+    let componentStatus = JSON.parse(payload) as RelayComponentStatusDto;
+    this.setState({
+      fanSwitch: componentStatus.status === Status.ON,
+      fanStatus: componentStatus.status,
+    });
+  };
+
   onLogin = (data: LoginDto) => {
     this.setState({ isLogging: true });
     APIService.login(data)
@@ -160,6 +198,30 @@ export default class HomeActivity extends React.Component {
       });
   };
 
+  handleFanSwitch = (isOn: boolean) => {
+    let topic = "home/living-room/fan/status/change";
+    let payload = JSON.stringify({
+      status: this.state.fanSwitch ? "OFF" : "ON",
+    });
+    AgentService.getInstance().Hub.invoke(
+      AgentService.RpcInvokePublish,
+      topic,
+      payload
+    );
+  };
+
+  handleLightSwitch = (isOn: boolean) => {
+    let topic = "home/living-room/light/status/change";
+    let payload = JSON.stringify({
+      status: this.state.lightSwitch ? "OFF" : "ON",
+    });
+    AgentService.getInstance().Hub.invoke(
+      AgentService.RpcInvokePublish,
+      topic,
+      payload
+    );
+  };
+
   render() {
     if (this.state.shouldRender) {
       return (
@@ -180,7 +242,18 @@ export default class HomeActivity extends React.Component {
               timeSeries: this.state.timeSeries,
             }}
           >
-            <HomeActivityView />
+            <LightFanActionProvider
+              value={{
+                lightStatus: this.state.lightStatus,
+                fanStatus: this.state.fanStatus,
+                lightSwitch: this.state.lightSwitch,
+                fanSwitch: this.state.fanSwitch,
+                onFanSwitch: this.handleFanSwitch,
+                onLightSwitch: this.handleLightSwitch,
+              }}
+            >
+              <HomeActivityView />
+            </LightFanActionProvider>
           </TemperatureHumidityProvider>
         </AuthProvider>
       );
@@ -190,6 +263,5 @@ export default class HomeActivity extends React.Component {
 }
 
 /*      TODO :
- * fan and light switching
  * connect status
  */
