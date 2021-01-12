@@ -13,16 +13,25 @@ import {
   Button,
 } from "react-native";
 import { AuthContext } from "../../../context/AuthContext";
+import { ConnectivityContext } from "../../../context/ConnectivityContext";
 
 interface Props {}
 
 export default function HomeActivityView(props: Props) {
   const authContext = React.useContext(AuthContext);
+  const connectivityContext = React.useContext(ConnectivityContext);
 
   return (
     <SafeAreaView>
       <ScrollView>
-        <View style={styles.container}>
+        <View
+          style={
+            connectivityContext.isAgentAndBrokerIsConnected &&
+            connectivityContext.isMobileAndAgentIsConnected
+              ? styles.containerGreen
+              : styles.containerRed
+          }
+        >
           <StatusBar />
 
           <LoginModal />
@@ -77,7 +86,18 @@ export default function HomeActivityView(props: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#000000",
+    alignItems: "center",
+  },
+
+  containerRed: {
+    flex: 1,
+    backgroundColor: "#FFC0C0",
+    alignItems: "center",
+  },
+  containerGreen: {
+    flex: 1,
+    backgroundColor: "#D7FFC0",
     alignItems: "center",
   },
 

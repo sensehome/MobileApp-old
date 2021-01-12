@@ -11,6 +11,7 @@ import { TemperatureHumidityProvider } from "../../context/TemperatureHumidityCo
 import { LightFanActionProvider } from "../../context/LightFanActionContext";
 import { RelayComponentStatusDto } from "../../models/RelayComponentDto";
 import { Status } from "../../util/EnumTypes";
+import { ConnectivityProvider } from "../../context/ConnectivityContext";
 
 export default class HomeActivity extends React.Component {
   state = {
@@ -26,6 +27,8 @@ export default class HomeActivity extends React.Component {
     fanStatus: "N/A",
     lightSwitch: false,
     fanSwitch: false,
+    isMobileAndAgentIsConnected: false,
+    isAgentAndBrokerIsConnected: false,
   };
 
   MAX_X = 7;
@@ -56,6 +59,10 @@ export default class HomeActivity extends React.Component {
           this.agentHubSubsriptions();
           AgentService.getInstance().Hub.onclose((err) => {
             this.autoReconnectAgent();
+          });
+          this.setState({
+            isAgentAndBrokerIsConnected: true,
+            isMobileAndAgentIsConnected: true,
           });
         })
         .catch((err) => {
@@ -101,7 +108,19 @@ export default class HomeActivity extends React.Component {
     }
   };
 
-  onAgentMqttConnectionCallback = (isConnected: boolean) => {};
+  onAgentMqttConnectionCallback = (isConnected: boolean) => {
+    if (isConnected) {
+      if (!this.state.isAgentAndBrokerIsConnected) {
+        this.setState({
+          isAgentAndBrokerIsConnected: true,
+        });
+      }
+    } else {
+      this.setState({
+        isAgentAndBrokerIsConnected: false,
+      });
+    }
+  };
 
   onTemperatureHumidityReadingCallback = (topic: string, payload: string) => {
     let temperatureHumidity = JSON.parse(payload) as TemperatureHumidityDto;
@@ -252,7 +271,16 @@ export default class HomeActivity extends React.Component {
                 onLightSwitch: this.handleLightSwitch,
               }}
             >
-              <HomeActivityView />
+              <ConnectivityProvider
+                value={{
+                  isMobileAndAgentIsConnected: this.state
+                    .isMobileAndAgentIsConnected,
+                  isAgentAndBrokerIsConnected: this.state
+                    .isAgentAndBrokerIsConnected,
+                }}
+              >
+                <HomeActivityView />
+              </ConnectivityProvider>
             </LightFanActionProvider>
           </TemperatureHumidityProvider>
         </AuthProvider>
@@ -261,7 +289,3 @@ export default class HomeActivity extends React.Component {
     return <></>;
   }
 }
-
-/*      TODO :
- * connect status
- */
