@@ -25,7 +25,6 @@ export default class HomeActivity extends React.Component {
     StoreService.getBearerToken()
       .then((res) => {
         this.initializeAgentHubConnection();
-        console.log(res);
       })
       .catch((err) => {
         this.setState({
@@ -147,9 +146,26 @@ export default class HomeActivity extends React.Component {
       });
   };
 
+  onLogout = () => {
+    StoreService.remoteBearerToken()
+      .then((res) => {})
+      .catch((err) => {})
+      .finally(() => {
+        this.setState({
+          shouldLogin: true,
+        });
+      });
+  };
+
   render() {
     if (this.state.shouldRender) {
-      return <HomeActivityView {...this.state} onLogin={this.onLogin} />;
+      return (
+        <HomeActivityView
+          {...this.state}
+          onLogin={this.onLogin}
+          onLogout={this.onLogout}
+        />
+      );
     }
     return <></>;
   }

@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ScrollView,
   Switch,
+  Button,
 } from "react-native";
 import {
   faFan,
@@ -26,6 +27,7 @@ interface Props {
   humidityList: number[];
   timeSeries: string[];
   onLogin: (data: LoginDto) => void;
+  onLogout: () => void;
   shouldLogin?: boolean;
   isLogging?: boolean;
 }
@@ -33,6 +35,7 @@ interface Props {
 export default function HomeActivityView(props: Props) {
   const [isEnabled, setIsEnabled] = React.useState(false);
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+
   return (
     <SafeAreaView>
       <ScrollView>
@@ -112,6 +115,8 @@ export default function HomeActivityView(props: Props) {
               <View
                 style={{
                   margin: 5,
+                  flex: 1,
+                  alignItems: "center",
                 }}
               >
                 <LineChart
@@ -124,6 +129,8 @@ export default function HomeActivityView(props: Props) {
               <View
                 style={{
                   margin: 5,
+                  flex: 1,
+                  alignItems: "center",
                 }}
               >
                 <LineChart
@@ -131,6 +138,24 @@ export default function HomeActivityView(props: Props) {
                   backgroundColor={Color.Primary}
                   data={props.humidityList}
                   labels={props.timeSeries}
+                />
+              </View>
+
+              <View
+                style={{
+                  paddingTop: 5,
+                  paddingBottom: 5,
+                  paddingLeft: 10,
+                  paddingRight: 10,
+                  marginBottom: 30,
+                }}
+              >
+                <Button
+                  title="Logout"
+                  onPress={(e) => {
+                    e.preventDefault();
+                    props.onLogout();
+                  }}
                 />
               </View>
             </View>
