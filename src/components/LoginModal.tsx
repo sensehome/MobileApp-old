@@ -1,23 +1,21 @@
 import React from "react";
 import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native";
+import { AuthContext } from "../context/AuthContext";
 import { LoginDto } from "../models/LoginDto";
 
-interface LoginModalProps {
-  onLogin: (data: LoginDto) => void;
-  show?: boolean;
-  isLogging?: boolean;
-}
+interface LoginModalProps {}
 
 const LoginModal = (props: LoginModalProps) => {
-  const [modalVisible, setModalVisible] = React.useState(false);
   const [userName, setUserName] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const authContext = React.useContext(AuthContext);
+
   return (
     <View style={styles.centeredView}>
       <Modal
         animationType="slide"
         transparent={true}
-        visible={props.show}
+        visible={!authContext.isLoggedIn}
         onRequestClose={() => {}}
       >
         <View style={styles.centeredView}>
@@ -49,10 +47,10 @@ const LoginModal = (props: LoginModalProps) => {
                 let login = new LoginDto();
                 login.name = userName;
                 login.password = password;
-                props.onLogin(login);
+                authContext.onLogin(login);
               }}
-              disabled={props.isLogging}
-              title={props.isLogging ? "Logging" : "Login"}
+              disabled={authContext.isLogging}
+              title={authContext.isLogging ? "Logging" : "Login"}
               accessibilityLabel="Login button"
             />
           </View>

@@ -1,18 +1,20 @@
 import React from "react";
-import HomeActivityView from "./HomeActivityView";
+import HomeActivityView from "./views/HomeActivityView";
+import APIService from "../../services/api.service";
+import StoreService from "../../services/store.service";
+import { LoginDto, TokenDto } from "../../models/LoginDto";
 import { HubConnectionState } from "@microsoft/signalr";
 import { TemperatureHumidityDto } from "../../models/TemperatureHumidityDto";
 import { AgentService } from "../../services/agent.service";
-import StoreService from "../../services/store.service";
-import { LoginDto, TokenDto } from "../../models/LoginDto";
-import APIService from "../../services/api.service";
+import { AuthProvider } from "../../context/AuthContext";
+import { TemperatureHumidityProvider } from "../../context/TemperatureHumidityContext";
 
 export default class HomeActivity extends React.Component {
   state = {
     temperature: 0.0,
     humidity: 0.0,
     shouldRender: false,
-    shouldLogin: false,
+    isLoggedIn: false,
     isLogging: false,
     temperatureList: [0],
     humidityList: [0],
@@ -25,12 +27,11 @@ export default class HomeActivity extends React.Component {
     StoreService.getBearerToken()
       .then((res) => {
         this.initializeAgentHubConnection();
-      })
-      .catch((err) => {
         this.setState({
-          shouldLogin: true,
+          isLoggedIn: true,
         });
       })
+      .catch((err) => {})
       .finally(() => {
         this.setState({
           shouldRender: true,
@@ -133,9 +134,10 @@ export default class HomeActivity extends React.Component {
           })
           .finally(() => {
             this.setState({
-              shouldLogin: false,
+              isLoggedIn: true,
               isLogging: false,
             });
+            this.initializeAgentHubConnection();
           });
       })
       .catch((err) => {
@@ -146,13 +148,14 @@ export default class HomeActivity extends React.Component {
       });
   };
 
-  onLogout = () => {
+  onLogout = async () => {
+    await AgentService.getInstance().Hub.stop();
     StoreService.remoteBearerToken()
       .then((res) => {})
       .catch((err) => {})
       .finally(() => {
         this.setState({
-          shouldLogin: true,
+          isLoggedIn: false,
         });
       });
   };
@@ -160,13 +163,33 @@ export default class HomeActivity extends React.Component {
   render() {
     if (this.state.shouldRender) {
       return (
-        <HomeActivityView
-          {...this.state}
-          onLogin={this.onLogin}
-          onLogout={this.onLogout}
-        />
+        <AuthProvider
+          value={{
+            onLogin: this.onLogin,
+            onLogout: this.onLogout,
+            isLogging: this.state.isLogging,
+            isLoggedIn: this.state.isLoggedIn,
+          }}
+        >
+          <TemperatureHumidityProvider
+            value={{
+              temperatureHistory: this.state.temperatureList,
+              humiditityHistory: this.state.humidityList,
+              temperature: this.state.temperature,
+              humidity: this.state.humidity,
+              timeSeries: this.state.timeSeries,
+            }}
+          >
+            <HomeActivityView />
+          </TemperatureHumidityProvider>
+        </AuthProvider>
       );
     }
     return <></>;
   }
 }
+
+/*      TODO :
+ * fan and light switching
+ * connect status
+ */
