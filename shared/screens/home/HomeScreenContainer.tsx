@@ -1,5 +1,5 @@
 import React from "react";
-import HomeActivityView from "./views/HomeActivityView";
+import HomeScreenView from "./views/HomeScreenView";
 import APIService from "../../services/api.service";
 import StoreService from "../../services/store.service";
 import { LoginDto, TokenDto } from "../../models/LoginDto";
@@ -13,7 +13,7 @@ import { RelayComponentStatusDto } from "../../models/RelayComponentDto";
 import { Status } from "../../util/EnumTypes";
 import { ConnectivityProvider } from "../../context/ConnectivityContext";
 
-export default class HomeActivity extends React.Component {
+export default class HomeScreenContainer extends React.Component {
   state = {
     temperature: 0.0,
     humidity: 0.0,
@@ -279,7 +279,7 @@ export default class HomeActivity extends React.Component {
                     .isAgentAndBrokerIsConnected,
                 }}
               >
-                <HomeActivityView />
+                <HomeScreenView />
               </ConnectivityProvider>
             </LightFanActionProvider>
           </TemperatureHumidityProvider>

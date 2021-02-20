@@ -17,7 +17,7 @@ import { ConnectivityContext } from "../../../context/ConnectivityContext";
 
 interface Props {}
 
-export default function HomeActivityView(props: Props) {
+const HomeScreenView = (props: Props) => {
   const authContext = React.useContext(AuthContext);
   const connectivityContext = React.useContext(ConnectivityContext);
 
@@ -81,7 +81,7 @@ export default function HomeActivityView(props: Props) {
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -107,3 +107,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
 });
+
+export default HomeScreenView;
