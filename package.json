@@ -1,9 +1,8 @@
 {
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
     "web": "expo start --web",
     "eject": "expo eject"
   },
@@ -16,14 +15,20 @@
     "axios": "^0.21.1",
     "expo": "~40.0.0",
     "expo-secure-store": "~9.3.0",
+    "expo-splash-screen": "~0.8.0",
     "expo-status-bar": "~1.0.3",
+    "expo-updates": "~0.4.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz",
+    "react-native": "~0.63.4",
     "react-native-chart-kit": "^6.8.1",
     "react-native-elements": "^3.0.0",
+    "react-native-gesture-handler": "~1.8.0",
     "react-native-gradient-card-view": "^0.2.1",
+    "react-native-reanimated": "~1.13.0",
+    "react-native-screens": "~2.15.0",
     "react-native-svg": "^12.1.0",
+    "react-native-unimodules": "~0.12.0",
     "react-native-web": "~0.13.12"
   },
   "devDependencies": {
@@ -31,7 +36,12 @@
     "@types/react": "~16.9.35",
     "@types/react-dom": "~16.9.8",
     "@types/react-native": "~0.63.2",
+    "babel-jest": "~25.2.6",
+    "jest": "~25.2.6",
+    "react-test-renderer": "~16.13.1",
     "typescript": "~4.0.0"
   },
-  "private": true
+  "private": true,
+  "name": "MobileApp",
+  "version": "1.0.0"
 }
